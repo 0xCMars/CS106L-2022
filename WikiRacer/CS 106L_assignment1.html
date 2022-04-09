@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CS 106L: Standard C++ Programming</title>
+        <!-- Bootstrap CSS file -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/main.css?ver=100">
+        <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="components/navbar.js" type="text/javascript" defer></script>
+        <script src="components/footer.js" type="text/javascript" defer></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+    </head>
+    <body>
+        <navbar-component currentPage="assignments"></navbar-component>
+        <div style="height: 0px;">&nbsp;</div> <!-- margin bleeding issues -->
+        <div class="body-container">
+            <div class="body body-assignment">
+                <div class="subcontainer">
+                    <div class="content-bottom" style="width:100%;margin-bottom: 2em">
+                        <h1 style="font-weight:700; margin:0 0;">Assignment 1: WikiRacer Pt. 1</h1>
+                        <div class="description">
+                            <p><i>Assignment due on Paperless on Sunday, April 24 at 11:59 PM</i></p>
+
+                            <h3>Introduction and Assignment Goals</h3>
+                            <p>It's undeniable: human beings are obsessed with finding patterns.
+                            Whether it's in the mysteries of language, the beauties of art, or the depths of strategic games, <a href="http://web.stanford.edu/class/think3/">finding patterns</a> is built into our DNA.
+                            In fact, some biologists believe that finding patterns is what sets us apart as a species.</p>
+
+                            <p>One interesting place to find interesting patterns is Wikipedia.
+                            For example, we can play a game called <a href="https://www.thewikigame.com/group"><b>WikiRacer</b></a>, where we try to
+                            move from one article to another with the fewest number of clicks. Try a round online before you move on! </p>
+
+                            <div class="aside-container">
+                                <div class="aside">
+                                    Aside: did you know that if you click the first link on any Wikipedia page repeatedly, you'll eventually always end up at Philosophy 97% of the time?
+                                </div>
+                            </div>
+                            <p> In Assignments 1 and 2, we will be building a standard C++ program that plays WikiRacer!
+                            Specifically, it will find a path between two given Wikipedia articles in the fewest number of links. Throughout this and next assignment, we'll refer to
+                            this path as a "ladder."
+                            In the process of completing Assignments 1 and 2, you will get practice working with iterators, algorithms, templates, and special containers like a priority queue. We expect that
+                            this assignment will take you less than 30 minutes.</p>
+
+                            <!-- <p>A broad pseudocode overview of our algorithm is as follows:</p>
+
+                                <pre><code class="language-cpp">To find a ladder from startPage to endPage:
+  Make startPage the currentPage being processed.
+  Get set of links on currentPage.
+  If endPage is one of the links on currentPage:
+    We are done! Return path of links followed to get here.
+  Otherwise visit each link on currentPage in an intelligent way and
+  search each of those pages in a similar manner.</code></pre> -->
+
+                                <p>
+                                To simplify the implementation and allow for some testing, we will do this in two parts (A1 and A2). For Assignment 1, you will be writing the user-facing side of the program. 
+                                You will have access to a function <code>findWikiLadder</code> that finds ladders between Wikipedia topics for you (you'll implement the core of this interesting search algorithm that finds the ladder in A2).
+                                You're in charge with writing parts of a main() function that will take a user-inputted file name, read in the file, 
+                                find Wiki ladders between the start and end destinations in the file, and print out the ladder. Let's get started!
+                                </p>
+                        </div>
+                    </div>
+
+                    <div class="content-bottom" style="border-left-color: var(--palette-dark-cream);margin-bottom: 2em">
+                        <div class="description">
+                            <h3>Download And Set Up Assignment</h3>
+                            <p>If you haven't already, please follow the instructions on <a href="assignment-setup">this page</a> before proceeding. 
+                            Please do both the one-time instructions and the instructions for editing each assignment. Since we're working on
+                            assignment1, you can follow the instructions exactly.
+                            If you have any questions at all, please don't hesitate to send us an email!
+                            </p>
+                        </div>
+                    </div>
+                    <div class="content-bottom" style="border-left-color: var(--palette-dark-brown);margin-bottom: 2em">
+                        <h3>Assignment Details</h3>
+                        <div class="description">
+                            <p>If you've already completed the Assignment Setup and downloaded, and set up Assignment 1, you are all set to start coding! In this assignment, you'll only be editing <code>main.cpp</code>. 
+                            The assignment comes with sample files you can test your programs on in the "res" folder. We'd recommend exploring them, as well as adding your own test cases in random.txt.
+                            </p>
+                            <ol>
+                                <li> Your first task is to <b>implement file reading</b> for main.cpp. This should take roughly 10 lines of code.
+                                    We have already provided the code to read in a filename from the user. Specifically, your task is to create a filestream from the filename (check out <code>std::ifstream</code>), 
+                                    and then process the file data appropriately for the given program as follows.
+                                    <ul>
+                                        <li>The input files are formatted as follows: the first line contains the number of input pairs in the file, and each subsequent line consists of one input pair
+                                            (i.e. two words, a start_page and end_page, separated by a space.) See <code>input-small.txt</code> or <code>input-big.txt</code> 
+                                            for an example. You can assume files will be formatted correctly.</li>
+                                        <li>
+                                            For each input pair, parse out the start_page and end_page into strings. If you're using <a href="https://en.cppreference.com/w/cpp/string/basic_string/getline">getline</a>, you will need to do string processing on the return value of std::getline. If you're using std::ifstream, then you can use the &gt; &gt; operator to set the start_page and end_page strings. Next, once you have the two strings that represent the starting page and ending page
+                                            on each line, then call <code>findWikiLadder</code> and append its result to the <code>outputLadders</code> vector. To see its function signature (and thus what parameters the <code>findWikiLadder</code> function takes), check out <code>wikiscraper.h</code>!
+                                    </ul>
+
+                                <li> Your second and final task will be to print out the contents of <code>outputLadders</code>, however you may like!</li>
+                                <li>
+                                    To submit, visit <a href="http://paperless.stanford.edu">paperless.stanford.edu</a>, navigate to the appropriate assignment (assignment 1) under the CS106L class, and submit the suggested files (and ONLY the suggested files, please!).
+                                </li>
+                            </ol>
+                            <div class="aside-container">
+                                <div class="aside lav trans100">
+                                    We have implemented (and hidden) findWikiLadder for you! It will give you real Wiki ladders! Stay tuned for the next assignment, where you implement the core of this function yourself!
+                                </div>
+                            </div>
+
+                            <p>
+                            <b>Implementation tips:</b>
+                            <ul>
+                                <li>To pass this assignment, please give both of the tasks above your best shot. If you're having difficulty with either (or with setting up your environment), please don't hesitate
+                                    to reach out to us!</li>
+                                <li>Remember to avoid mixing <code>cin</code> and <code>getline</code>!</li>
+                                <li>Depending on how you implement reading in values, you may end up needing to convert a string to an integer.
+                                    To do so, you can use the <code>stoi(line)</code> function, which takes in a <code>string line</code> and returns the integer it represents.</li>
+                                <li>In order to check your code, you can print out each input pair before it gets passed into <code>findWikiLinks</code>. The starter code already prints out filenames upon which to test your code.</li>
+                            </ul>
+                            </p>
+                            <div class="aside-container trans100">
+                                <div class="aside lav">
+                                    For this assignment, you don’t need to handle the case that the user inputs an invalid filename.
+                                    (Since you are your own user in this case, make sure that the filenames you type in are valid!)
+                                </div>
+                            </div>
+                            <p>That's it! We've made this assignment a bit shorter than usual, to accommodate for <a href="assignment-setup">setting up your environment</a>,
+                            the surely hectic return to campus, and to give you capacity to explore the assignment code. We recommend adding your own Wiki ladders to 
+                            random.txt, as well as checking out <code>wikiscraper.h</code> and <code>setup.sh</code>. This assignment (and class) is one that will reward 
+                            you for putting more effort into learning from the materials we provide you!. Lastly, you can expect future assignments to take around as long as this one took you. <p/>And finally... <span style="font-size: 2em;">Good luck! :)</span></p>
+
+                        </div>
+                    </div>
+
+                    <!--   <p>If you want to discuss your plan of attack, please make a private post on Piazza or come to office hours!
+                        The code for this assignment is not long at all, but it can be hard to wrap your head around.
+                        Ask questions early if things don’t make sense; we will be more than happy to talk through ideas with you.</p>
+                        <br/> -->
+
+                        <!--  <div class="panel">
+                            <h3>Submitting</h3>
+                            <p>First, make sure your assignment satisfies the following:</p>
+                            <ul>
+                            <li>You are using the STL algorithms described in Part A, rather than their explicit loop equivalents.
+                            In total, you should only use <b>one</b> loop while writing your <code>findWikiLinks</code> function.
+                            <b>Note that you will need other loops for other parts of the assignment--that's totally fine!</b></li>
+                            <li>You are <b>not</b> using indices or builtin string methods such as <code>string.find</code>.</li>
+                            <li>You can run the examples in the Testing section within reasonable time limits.</li>
+                            </ul>
+                            <p>When you're finished, submit <b>two files:</b> <code>main.cpp</code> and <code>wikiscraper.cpp</code>
+                            from the WikiRacer project on Paperless!</p> -->
+
+
+
+                        </div>
+                </div>
+                <br/>
+            </div>
+    </body>
+<footer></footer>
+</html>
