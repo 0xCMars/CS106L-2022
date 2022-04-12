@@ -206,11 +206,11 @@ void HashMap<K, M, H>::debug() const {
 
 template <typename K, typename M, typename H>
 void HashMap<K, M, H>::rehash(size_t new_bucket_count) {
-if (new_bucket_count == 0) {
-    throw std::out_of_range("HashMap<K, M, H>::rehash: new_bucket_count must be positive.");
-}
+    if (new_bucket_count == 0) {
+        throw std::out_of_range("HashMap<K, M, H>::rehash: new_bucket_count must be positive.");
+    }
 
-std::vector<node*> new_buckets_array(new_bucket_count, nullptr);
+    std::vector<node*> new_buckets_array(new_bucket_count, nullptr);
     for (auto& curr : _buckets_array) { // short answer question is asking about this 'curr'
         while (curr != nullptr) {
             const auto& [key, mapped] = curr->value;
@@ -267,6 +267,7 @@ std::ostream& operator<<(std::ostream& os, const HashMap<K, M, H>& rhs) {
 
 /* Begin Milestone 2: Special Member Functions */
 // milestone 2
+// copy constructor
 template <typename K, typename M, typename H> 
 HashMap<K, M, H>::HashMap(const HashMap& obj) :
     _size{0},
@@ -288,7 +289,7 @@ HashMap<K, M, H>::HashMap(const HashMap& obj) :
         insert(*it);
     }
 }
-
+// copy assignment
 template <typename K, typename M, typename H>
 HashMap<K, M, H>& HashMap<K, M, H>::operator=(const HashMap& obj) {
     if (&obj == this) {
@@ -313,13 +314,20 @@ HashMap<K, M, H>& HashMap<K, M, H>::operator=(const HashMap& obj) {
     return *this;
 }
 
+// move constructor
 template <typename K, typename M, typename H>
-HashMap<K, M, H>::HashMap (HashMap&& robj) {
-    _size = std::move(robj.size());
-    _hash_function = std::move(robj._hash_function);
-    _buckets_array = std::move(robj._buckets_array);
+HashMap<K, M, H>::HashMap (HashMap&& robj) :
+    _size{std::move(robj._size)},
+    _hash_function{std::move(robj._hash_function)},
+    _buckets_array{std::move(robj._buckets_array)} {
+    for (size_t i = 0; i < robj.bucket_count(); i++) {
+        _buckets_array[i] = std::move(robj._buckets_array[i]);
+        robj._buckets_array[i] = nullptr;
+    }
+    robj._size = 0;
 }
 
+// move assignment
 template <typename K, typename M, typename H>
 HashMap<K, M, H>& HashMap<K, M, H>::operator = (HashMap&& robj) {
     if (&robj == this) {
@@ -328,7 +336,12 @@ HashMap<K, M, H>& HashMap<K, M, H>::operator = (HashMap&& robj) {
     clear();
     _size = std::move(robj.size());
     _hash_function = std::move(robj._hash_function);
-    _buckets_array = std::move(robj._buckets_array);
+    _buckets_array.resize(robj.bucket_count());
+    for (size_t i = 0; i < robj.bucket_count(); i++) {
+        _buckets_array[i] = std::move(robj._buckets_array[i]);
+        robj._buckets_array[i] = nullptr;
+    }
+    robj._size = 0;
     return *this;
 }
 /* end student code */

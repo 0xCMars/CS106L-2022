@@ -1252,8 +1252,10 @@ void A_copy_ctor_basic() {
         map.insert(kv_pair);
         answer.insert(kv_pair);
     }
+    // map.debug();
     // create copies via copy constructor
     HashMap<std::string, int> copy_constructed{map};
+    // copy_constructed.debug();
     std::unordered_map<std::string, int> copy_constructed_answer{answer};
     VERIFY_TRUE(check_map_equal(copy_constructed, copy_constructed_answer), __LINE__);
     VERIFY_TRUE(check_map_equal(map, answer), __LINE__);
@@ -1615,9 +1617,11 @@ void F_move_edge() {
         // Check that the map is still assignable from.
         HashMap<std::string, int> copy = map1;
         HashMap<std::string, int> temp, new_assign;
+        // map1.debug();
         temp = std::move(map1);
-        new_assign = std::move(temp);
-        VERIFY_TRUE(check_map_equal(new_assign, temp), __LINE__);
+        new_assign = std::move(temp);   // after move action, we should not use temp to compare again, the orignal code may be wrong
+        // VERIFY_TRUE(check_map_equal(new_assign, temp), __LINE__);
+        VERIFY_TRUE(check_map_equal(new_assign, copy), __LINE__);
     }
 }
 #endif
