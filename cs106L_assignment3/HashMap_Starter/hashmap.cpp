@@ -21,22 +21,22 @@ HashMap<K, M, H>::~HashMap() {
 }
 
 template <typename K, typename M, typename H>
-inline size_t HashMap<K, M, H>::size() {
+inline size_t HashMap<K, M, H>::size() const noexcept{
     return _size;
 }
 
 template <typename K, typename M, typename H>
-inline bool HashMap<K, M, H>::empty() {
+inline bool HashMap<K, M, H>::empty() const noexcept{
     return size() == 0;
 }
 
 template <typename K, typename M, typename H>
-inline float HashMap<K, M, H>::load_factor() {
+inline float HashMap<K, M, H>::load_factor() const noexcept {
     return static_cast<float>(size())/bucket_count();
 };
 
 template <typename K, typename M, typename H>
-inline size_t HashMap<K, M, H>::bucket_count() const{
+inline size_t HashMap<K, M, H>::bucket_count() const noexcept {
     return _buckets_array.size();
 };
 
@@ -49,8 +49,15 @@ M& HashMap<K, M, H>::at(const K& key) {
     return node_found->value.second;
 }
 
+// milestone 2
 template <typename K, typename M, typename H>
-bool HashMap<K, M, H>::contains(const K& key) {
+const M& HashMap<K, M, H>::at(const K& key) const {
+    // see static_cast/const_cast trick explained in find().
+    return static_cast<const M&>(const_cast<HashMap<K, M, H>*>(this)->at(key));
+}
+
+template <typename K, typename M, typename H>
+bool HashMap<K, M, H>::contains(const K& key) const noexcept{
     return find_node(key).second != nullptr;
 }
 
@@ -67,6 +74,12 @@ void HashMap<K, M, H>::clear() {
 template <typename K, typename M, typename H>
 typename HashMap<K, M, H>::iterator HashMap<K, M, H>::find(const K& key) {
     return make_iterator(find_node(key).second);
+}
+
+// milestone2
+template <typename K, typename M, typename H>
+typename HashMap<K, M, H>::const_iterator HashMap<K, M, H>::find(const K& key) const {
+    return static_cast<const_iterator>(const_cast<HashMap<K, M, H>*>(this)->find(key));
 }
 
 template <typename K, typename M, typename H>
@@ -126,6 +139,12 @@ typename HashMap<K, M, H>::iterator HashMap<K, M, H>::end() {
     return make_iterator(nullptr);
 }
 
+// milestone2
+template <typename K, typename M, typename H>
+typename HashMap<K, M, H>::const_iterator HashMap<K, M, H>::end() const {
+    return static_cast<const_iterator>(const_cast<HashMap<K, M, H>*>(this)->end());
+}
+
 template <typename K, typename M, typename H>
 size_t HashMap<K, M, H>::first_not_empty_bucket() const {
     auto isNotNullptr = [ ](const auto& v){
@@ -164,7 +183,7 @@ typename HashMap<K, M, H>::iterator HashMap<K, M, H>::erase(typename HashMap<K, 
 }
 
 template <typename K, typename M, typename H>
-    void HashMap<K, M, H>::debug() {
+void HashMap<K, M, H>::debug() const {
     std::cout << std::setw(30) << std::setfill('-') << '\n' << std::setfill(' ')
           << "Printing debug information for your HashMap implementation\n"
           << "Size: " << size() << std::setw(15) << std::right
@@ -247,5 +266,69 @@ std::ostream& operator<<(std::ostream& os, const HashMap<K, M, H>& rhs) {
 }
 
 /* Begin Milestone 2: Special Member Functions */
+// milestone 2
+template <typename K, typename M, typename H> 
+HashMap<K, M, H>::HashMap(const HashMap& obj) :
+    _size{0},
+    _hash_function{obj._hash_function},
+    _buckets_array{obj.bucket_count(), nullptr} {
+    // size_t buckets_size = obj.bucket_count();
+    // for (size_t index = 0 ; index < buckets_size ; index++) {
+    //     node* elem = new node(obj._buckets_array[index]->value, obj._buckets_array[index]->next);
+    //     _buckets_array[index] = elem;
+    //     while (elem->next != nullptr) {
+    //         node* nelem = new node(elem->next->value, elem->next->next);
+    //         elem->next = nelem;
+    //         elem = nelem;
+    //     }
+    //     delete nelem;
+    // }
+    // auto it_begin = obj.begin(), it_end = obj.end();
+    for (auto it = obj.begin(); it != obj.end(); it++) {
+        insert(*it);
+    }
+}
 
+template <typename K, typename M, typename H>
+HashMap<K, M, H>& HashMap<K, M, H>::operator=(const HashMap& obj) {
+    if (&obj == this) {
+        return *this;
+    }
+    clear();
+    _hash_function = obj._hash_function;
+    // for (size_t index = 0 ; index < buckets_size ; index++) {
+    //     _buckets_array[index] = obj._buckets_array[index];
+    //     node* elem = _buckets_array[index];
+    //     while (elem->next != nullptr) {
+    //         node* nelem = new node(elem->next->value, elem->next->next);
+    //         elem->next = nelem;
+    //         elem = nelem;
+    //     }
+    //     delete nelem;
+    // }
+    // auto it_begin = obj.begin(), it_end = obj.end();
+    for (auto it = obj.begin(); it != obj.end(); it++) {
+        insert(*it);
+    }
+    return *this;
+}
+
+template <typename K, typename M, typename H>
+HashMap<K, M, H>::HashMap (HashMap&& robj) {
+    _size = std::move(robj.size());
+    _hash_function = std::move(robj._hash_function);
+    _buckets_array = std::move(robj._buckets_array);
+}
+
+template <typename K, typename M, typename H>
+HashMap<K, M, H>& HashMap<K, M, H>::operator = (HashMap&& robj) {
+    if (&robj == this) {
+        return *this;
+    }
+    clear();
+    _size = std::move(robj.size());
+    _hash_function = std::move(robj._hash_function);
+    _buckets_array = std::move(robj._buckets_array);
+    return *this;
+}
 /* end student code */
